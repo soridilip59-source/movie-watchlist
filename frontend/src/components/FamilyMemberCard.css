@@ -1,0 +1,81 @@
+.family-member-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.family-member-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.member-avatar-wrap {
+  position: relative;
+}
+
+.member-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--bg-input);
+  border: 2px solid var(--border-color);
+}
+
+.role-icon-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--accent-red);
+  color: white;
+  padding: 0.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.member-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.self-tag {
+  font-size: 0.8rem;
+  color: var(--accent-red);
+  font-weight: 500;
+}
+
+.member-email {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.member-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.join-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.remove-member-btn {
+  margin-left: auto;
+}

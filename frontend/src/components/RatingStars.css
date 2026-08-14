@@ -1,0 +1,21 @@
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.star-btn {
+  padding: 0.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+}
+
+.rating-stars.interactive .star-btn:hover {
+  transform: scale(1.2);
+}
+
+.rating-stars.read-only .star-btn {
+  cursor: default;
+}

@@ -1,0 +1,25 @@
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  color: #f87171;
+  font-size: 0.9rem;
+  font-weight: 500;
+  width: 100%;
+}
+
+.error-icon {
+  flex-shrink: 0;
+}
+
+.error-text {
+  flex: 1;
+}
+
+.retry-btn {
+  margin-left: auto;
+}
