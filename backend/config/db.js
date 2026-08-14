@@ -1,32 +1,29 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-
-let mongoServer;
 
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/family_watchlist';
+  // Support both MONGO_URI and MONGODB_URI env variable names
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+  // In production, crash immediately if no URI is provided
+  if (!uri) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[MongoDB] FATAL: MONGO_URI environment variable is not set!');
+      process.exit(1);
+    }
+    // Local dev fallback
+    console.warn('[MongoDB] No MONGO_URI set, trying local MongoDB...');
+  }
+
+  const connectionUri = uri || 'mongodb://127.0.0.1:27017/family_watchlist';
+
   try {
-    // Attempt standard connection with 3-second server selection timeout
-    await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 3000,
+    await mongoose.connect(connectionUri, {
+      serverSelectionTimeoutMS: 5000,
     });
     console.log(`[MongoDB] Connected successfully to ${mongoose.connection.host}`);
   } catch (error) {
-    console.warn(`[MongoDB] Connection to local MongoDB (${uri}) failed: ${error.message}`);
-    console.log('[MongoDB] Starting in-memory MongoDB fallback server...');
-    try {
-      mongoServer = await MongoMemoryServer.create({
-        instance: {
-          spawnTimeoutMS: 60000,
-        },
-      });
-      const mongoUri = mongoServer.getUri();
-      await mongoose.connect(mongoUri);
-      console.log(`[MongoDB] Connected to fallback MongoMemoryServer at ${mongoUri}`);
-    } catch (fallbackError) {
-      console.error(`[MongoDB] Fallback connection failed: ${fallbackError.message}`);
-      process.exit(1);
-    }
+    console.error(`[MongoDB] Connection failed: ${error.message}`);
+    process.exit(1);
   }
 };
 
