@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Movie Watchlist & Recommendation API</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header Sidebar -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">🍿</div>
+        <div class="brand-text">
+          <h1>CineFamily</h1>
+          <span class="badge-sub">Watchlist API & Hub</span>
+        </div>
+      </div>
+
+      <!-- Family Profile Header Bar -->
+      <div class="family-switcher-card">
+        <div class="family-name-heading" id="family-title">The Miller Family</div>
+        <div class="family-avatars-row" id="family-avatars-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Main Navigation -->
+      <nav class="app-nav">
+        <button class="nav-btn active" data-tab="watchlist">
+          <span class="nav-icon">📋</span> Watchlist
+        </button>
+        <button class="nav-btn" data-tab="catalog">
+          <span class="nav-icon">🎬</span> Movie Catalog
+        </button>
+        <button class="nav-btn highlight-nav" data-tab="picker">
+          <span class="nav-icon">🎲</span> Movie Night Picker
+        </button>
+        <button class="nav-btn" data-tab="family">
+          <span class="nav-icon">👥</span> Family Profiles
+        </button>
+        <button class="nav-btn" data-tab="stats">
+          <span class="nav-icon">📊</span> Family Insights
+        </button>
+        <a href="/api-docs" target="_blank" class="nav-btn docs-btn">
+          <span class="nav-icon">📑</span> Swagger API Docs ↗
+        </a>
+      </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- TAB 1: WATCHLIST -->
+      <section id="tab-watchlist" class="tab-page active">
+        <div class="page-header">
+          <div>
+            <h2>Family Watchlist</h2>
+            <p>Track movies your family wants to watch together or has enjoyed.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddMovieModal()">+ Add Movie</button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-card">
+          <div class="filter-group">
+            <label>Watch Status</label>
+            <select id="filter-status" onchange="loadWatchlist()">
+              <option value="">All Statuses</option>
+              <option value="want_to_watch">Want to Watch</option>
+              <option value="watching">Currently Watching</option>
+              <option value="watched">Watched</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Priority</label>
+            <select id="filter-priority" onchange="loadWatchlist()">
+              <option value="">All Priorities</option>
+              <option value="high">🔥 High</option>
+              <option value="medium">⭐ Medium</option>
+              <option value="low">💤 Low</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Added By Member</label>
+            <select id="filter-member" onchange="loadWatchlist()">
+              <option value="">Everyone</option>
+              <!-- JS options -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Watchlist Grid -->
+        <div class="movie-grid" id="watchlist-container">
+          <!-- JS dynamic content -->
+        </div>
+      </section>
+
+      <!-- TAB 2: MOVIE CATALOG -->
+      <section id="tab-catalog" class="tab-page">
+        <div class="page-header">
+          <div>
+            <h2>Movie Catalog</h2>
+            <p>Explore all movies available in the master database.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddMovieModal()">+ Add New Movie</button>
+        </div>
+
+        <!-- Catalog Search Bar -->
+        <div class="filter-card">
+          <div class="filter-group flex-2">
+            <label>Search Title, Director or Synopsis</label>
+            <input type="text" id="catalog-search" placeholder="Search movies..." oninput="debounce(loadCatalog, 300)()">
+          </div>
+          <div class="filter-group">
+            <label>Genre</label>
+            <select id="catalog-genre" onchange="loadCatalog()">
+              <option value="">All Genres</option>
+              <option value="Animation">Animation</option>
+              <option value="Action">Action</option>
+              <option value="Adventure">Adventure</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Family">Family</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Drama">Drama</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Content Rating</label>
+            <select id="catalog-rating" onchange="loadCatalog()">
+              <option value="">All Ratings</option>
+              <option value="G">G (All Ages)</option>
+              <option value="PG">PG (Parental Guidance)</option>
+              <option value="PG-13">PG-13 (Teens)</option>
+              <option value="R">R (Adults Only)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Catalog Grid -->
+        <div class="movie-grid" id="catalog-container">
+          <!-- JS dynamic content -->
+        </div>
+      </section>
+
+      <!-- TAB 3: MOVIE NIGHT PICKER -->
+      <section id="tab-picker" class="tab-page">
+        <div class="page-header">
+          <div>
+            <h2>🎲 Family Movie Night Generator</h2>
+            <p>Pick attending family members — our smart engine calculates age rating limits and selects safe, high-rated movies!</p>
+          </div>
+        </div>
+
+        <div class="picker-container">
+          <!-- Left: Attendees Selector -->
+          <div class="picker-sidebar">
+            <div class="picker-card">
+              <h3>1. Who is attending?</h3>
+              <p class="subtext">Select everyone joining tonight's movie session:</p>
+              <div class="attending-checklist" id="attending-members-list">
+                <!-- JS checkboxes -->
+              </div>
+
+              <div class="safety-banner" id="safety-banner">
+                <div class="safety-icon">🛡️</div>
+                <div class="safety-info">
+                  <h4 id="safety-title">Age Rating Safe Guard</h4>
+                  <p id="safety-desc">Select members to compute maximum content rating allowed.</p>
+                </div>
+              </div>
+
+              <h3>2. Movie Filters (Optional)</h3>
+              <div class="form-group margin-top">
+                <label>Preferred Genre</label>
+                <select id="picker-genre">
+                  <option value="">Any Genre</option>
+                  <option value="Animation">Animation</option>
+                  <option value="Adventure">Adventure</option>
+                  <option value="Comedy">Comedy</option>
+                  <option value="Sci-Fi">Sci-Fi</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Max Duration</label>
+                <select id="picker-duration">
+                  <option value="">Any Length</option>
+                  <option value="90">Under 90 minutes</option>
+                  <option value="120">Under 2 hours</option>
+                  <option value="150">Under 2.5 hours</option>
+                </select>
+              </div>
+
+              <button class="btn btn-accent full-width btn-lg" onclick="generateMovieNightRecommendation()">
+                ✨ Generate Movie Night Pick!
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Recommendation Result & Winner Card -->
+          <div class="picker-main" id="picker-results">
+            <div class="empty-picker-placeholder">
+              <div class="placeholder-icon">🍿</div>
+              <h3>Ready for Family Movie Night?</h3>
+              <p>Select who is attending on the left and click <strong>Generate Movie Night Pick</strong> to spin the wheel!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: FAMILY PROFILES -->
+      <section id="tab-family" class="tab-page">
+        <div class="page-header">
+          <div>
+            <h2>Family Profiles & Ratings Restrictions</h2>
+            <p>Manage family members, age profiles, and maximum allowed content ratings.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddMemberModal()">+ Add Member</button>
+        </div>
+
+        <div class="members-grid" id="members-container">
+          <!-- JS content -->
+        </div>
+      </section>
+
+      <!-- TAB 5: STATS -->
+      <section id="tab-stats" class="tab-page">
+        <div class="page-header">
+          <div>
+            <h2>Family Watch Insights & Statistics</h2>
+            <p>Real-time analytics powered by `/api/v1/stats` endpoint.</p>
+          </div>
+        </div>
+
+        <div class="stats-dashboard" id="stats-container">
+          <!-- JS content -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: ADD MOVIE -->
+  <div class="modal" id="add-movie-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Movie to Catalog</h3>
+        <button class="close-btn" onclick="closeModal('add-movie-modal')">&times;</button>
+      </div>
+      <form id="add-movie-form" onsubmit="handleCreateMovie(event)">
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>Movie Title *</label>
+            <input type="text" id="m-title" required placeholder="e.g. Inside Out 2">
+          </div>
+          <div class="form-group">
+            <label>Release Year *</label>
+            <input type="number" id="m-year" required value="2024" min="1900" max="2100">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Content Rating *</label>
+            <select id="m-rating" required>
+              <option value="G">G - General Audiences</option>
+              <option value="PG" selected>PG - Parental Guidance</option>
+              <option value="PG-13">PG-13 - Parents Strongly Cautioned</option>
+              <option value="R">R - Restricted (17+)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Duration (Minutes) *</label>
+            <input type="number" id="m-duration" required value="105" min="10">
+          </div>
+          <div class="form-group">
+            <label>IMDb Score (0-10)</label>
+            <input type="number" id="m-imdb" value="7.5" step="0.1" min="0" max="10">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Genres (comma separated) *</label>
+          <input type="text" id="m-genres" required placeholder="Animation, Comedy, Family">
+        </div>
+
+        <div class="form-group">
+          <label>Director *</label>
+          <input type="text" id="m-director" required placeholder="Director name">
+        </div>
+
+        <div class="form-group">
+          <label>Streaming Services *</label>
+          <input type="text" id="m-streaming" required placeholder="e.g. Disney+, Netflix, Prime Video">
+        </div>
+
+        <div class="form-group">
+          <label>Synopsis *</label>
+          <textarea id="m-synopsis" required rows="3" placeholder="Brief story overview..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('add-movie-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Movie</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD MEMBER -->
+  <div class="modal" id="add-member-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Family Member Profile</h3>
+        <button class="close-btn" onclick="closeModal('add-member-modal')">&times;</button>
+      </div>
+      <form id="add-member-form" onsubmit="handleCreateMember(event)">
+        <div class="form-group">
+          <label>Member Name *</label>
+          <input type="text" id="mem-name" required placeholder="e.g. Alex">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Role *</label>
+            <select id="mem-role" required>
+              <option value="Parent">Parent</option>
+              <option value="Teen">Teen</option>
+              <option value="Kid">Kid</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Age *</label>
+            <input type="number" id="mem-age" required value="10" min="0">
+          </div>
+          <div class="form-group">
+            <label>Max Content Rating *</label>
+            <select id="mem-maxrating" required>
+              <option value="G">G</option>
+              <option value="PG" selected>PG</option>
+              <option value="PG-13">PG-13</option>
+              <option value="R">R</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Avatar Emoji</label>
+          <input type="text" id="mem-avatar" value="🦸" placeholder="Emoji icon">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('add-member-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: MOVIE DETAIL & RATING -->
+  <div class="modal" id="movie-detail-modal">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3 id="detail-title">Movie Details</h3>
+        <button class="close-btn" onclick="closeModal('movie-detail-modal')">&times;</button>
+      </div>
+      <div class="movie-detail-body" id="detail-body">
+        <!-- JS dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

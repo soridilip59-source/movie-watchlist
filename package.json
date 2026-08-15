@@ -1,0 +1,46 @@
+{
+  "name": "family-movie-watchlist-api",
+  "version": "1.0.0",
+  "description": "A RESTful API and Web Dashboard for Family Movie Watchlists with age-appropriate recommendations, family ratings, and watchlist analytics.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "seed": "tsx src/db/seed.ts",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "express",
+    "typescript",
+    "sqlite",
+    "watchlist",
+    "movies",
+    "family",
+    "api",
+    "swagger"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^9.9.2",
+    "sql.js": "^1.12.0",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "@types/sql.js": "^1.4.9",
+    "@types/supertest": "^6.0.2",
+    "@types/swagger-ui-express": "^4.1.7",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}
