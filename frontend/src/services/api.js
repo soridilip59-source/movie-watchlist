@@ -1,18 +1,33 @@
 import axios from 'axios';
 
-// Support VITE_API_BASE_URL, VITE_API_URL, or direct backend fallback
-const rawUrl =
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  'https://movie-watchlist-gfgv.vercel.app/api';
+// Get and sanitize API Base URL from environment or fallback
+function getApiBaseUrl() {
+  let url = (
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    'https://movie-watchlist-gfgv.vercel.app/api'
+  );
 
-let apiBaseUrl = rawUrl.replace(/\/$/, '');
-if (!apiBaseUrl.endsWith('/api') && !apiBaseUrl.includes('/api/')) {
-  apiBaseUrl += '/api';
+  if (typeof url !== 'string' || !url.trim()) {
+    url = 'https://movie-watchlist-gfgv.vercel.app/api';
+  }
+
+  url = url.trim().replace(/^["']|["']$/g, '');
+
+  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+    url = `https://${url}`;
+  }
+
+  url = url.replace(/\/+$/, '');
+  if (!url.endsWith('/api') && !url.includes('/api/')) {
+    url += '/api';
+  }
+
+  return url;
 }
 
 const API = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: getApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
