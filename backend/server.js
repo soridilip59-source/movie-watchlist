@@ -72,6 +72,21 @@ const authLimiter = rateLimit({
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
+// Root Welcome & Health Endpoint
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: '🍿 Family Movie Watchlist API is running smoothly in production',
+    endpoints: {
+      health: '/api/health',
+      auth_register: '/api/auth/register',
+      auth_login: '/api/auth/login',
+      movies: '/api/movies',
+      watchlist: '/api/watchlist'
+    }
+  });
+});
+
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
   res.json({
