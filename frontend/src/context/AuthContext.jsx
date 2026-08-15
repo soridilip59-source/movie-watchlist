@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
 
+  // Sync theme
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -19,8 +20,10 @@ export const AuthProvider = ({ children }) => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  // Load user profile on mount or token change
   const refreshUser = async () => {
-    if (!token) {
+    const savedToken = localStorage.getItem('token');
+    if (!savedToken) {
       setUser(null);
       setFamily(null);
       setLoading(false);
@@ -30,14 +33,15 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const res = await getCurrentUser();
-      if (res.success) {
-        setUser(res.data);
-        if (res.data.familyId) {
-          setFamily({ _id: res.data.familyId, name: res.data.familyName });
+      if (res && (res.success || res.user || res.data)) {
+        const userData = res.user || res.data;
+        setUser(userData);
+        if (userData.familyId) {
+          setFamily({ _id: userData.familyId, name: userData.familyName || 'My Family' });
         }
       }
     } catch (err) {
-      console.error('Failed to load user profile:', err.message);
+      console.warn('[AuthContext] Session expired or invalid:', err.message);
       logout();
     } finally {
       setLoading(false);
@@ -48,32 +52,35 @@ export const AuthProvider = ({ children }) => {
     refreshUser();
   }, [token]);
 
+  // Login handler
   const login = async (email, password) => {
     const res = await apiLogin({ email, password });
-    if (res.success && res.token) {
+    if (res && res.token) {
       localStorage.setItem('token', res.token);
       setToken(res.token);
       setUser(res.user);
-      if (res.user.familyId) {
-        setFamily({ _id: res.user.familyId });
+      if (res.user && res.user.familyId) {
+        setFamily({ _id: res.user.familyId, name: res.user.familyName || 'My Family' });
       }
     }
     return res;
   };
 
+  // Register handler
   const register = async (userData) => {
     const res = await apiRegister(userData);
-    if (res.success && res.token) {
+    if (res && res.token) {
       localStorage.setItem('token', res.token);
       setToken(res.token);
       setUser(res.user);
-      if (res.user.familyId) {
-        setFamily({ _id: res.user.familyId });
+      if (res.user && res.user.familyId) {
+        setFamily({ _id: res.user.familyId, name: res.user.familyName || 'My Family' });
       }
     }
     return res;
   };
 
+  // Logout handler
   const logout = () => {
     localStorage.removeItem('token');
     setToken('');

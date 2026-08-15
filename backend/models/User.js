@@ -5,31 +5,37 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please provide a name'],
+      required: [true, 'Please provide your full name'],
       trim: true,
+      minlength: [2, 'Name must be at least 2 characters'],
+      maxlength: [50, 'Name cannot exceed 50 characters'],
     },
     email: {
       type: String,
-      required: [true, 'Please provide an email'],
+      required: [true, 'Please provide a valid email address'],
       unique: true,
-      lowercase: true,
       trim: true,
+      lowercase: true,
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/,
+        'Please enter a valid email address',
+      ],
     },
     password: {
       type: String,
-      required: [true, 'Please provide a password'],
-      minlength: 6,
+      required: [true, 'Please provide a secure password'],
+      minlength: [6, 'Password must be at least 6 characters long'],
       select: false,
     },
     role: {
       type: String,
-      enum: ['parent', 'child'],
+      enum: ['parent', 'child', 'admin'],
       default: 'parent',
-      required: true,
     },
-    avatar: {
-      type: String,
-      default: '',
+    familyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Family',
+      default: null,
     },
   },
   {
@@ -37,7 +43,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving user
+// Hash password using bcrypt before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -47,10 +53,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Compare password method
+// Compare entered password with hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
 module.exports = User;

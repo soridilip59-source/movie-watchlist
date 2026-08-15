@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Film, UserPlus, Key, Mail, User, Shield, Smile } from 'lucide-react';
-import ErrorMessage from '../components/ErrorMessage';
+import { Film, UserPlus, Key, Mail, User, Shield, Smile, AlertCircle } from 'lucide-react';
 import './AuthPages.css';
 
 const Register = () => {
@@ -20,17 +19,26 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    if (!name || !email || !password) return setError('Please fill in all required fields.');
-    if (password.length < 6) return setError('Password must be at least 6 characters.');
+    if (!name.trim()) return setError('Please enter your full name.');
+    if (!email.trim()) return setError('Please enter a valid email address.');
+    if (!password) return setError('Please enter a password.');
+    if (password.length < 6) return setError('Password must be at least 6 characters long.');
 
     try {
       setLoading(true);
-      const res = await register({ name, email, password, role });
-      if (res.success) {
+      const res = await register({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        role,
+      });
+
+      if (res && (res.success || res.token)) {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Registration failed.');
+      console.error('[Register] Error:', err);
+      setError(err.message || 'Registration failed. Please check your details.');
     } finally {
       setLoading(false);
     }
@@ -48,7 +56,24 @@ const Register = () => {
           <p>Join CineFamily to start your family movie watchlist</p>
         </div>
 
-        {error && <ErrorMessage message={error} />}
+        {error && (
+          <div className="auth-error-banner animate-slide-down" role="alert" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            backgroundColor: 'rgba(229, 9, 20, 0.12)',
+            border: '1px solid rgba(229, 9, 20, 0.4)',
+            color: '#ff6b6b',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}>
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -61,6 +86,7 @@ const Register = () => {
                 placeholder="e.g. John Miller"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
                 required
               />
             </div>
@@ -76,6 +102,7 @@ const Register = () => {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 required
               />
             </div>
@@ -91,6 +118,7 @@ const Register = () => {
                 placeholder="At least 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
                 required
               />
             </div>
