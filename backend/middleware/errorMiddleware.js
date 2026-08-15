@@ -11,7 +11,7 @@ const errorHandler = (err, req, res, next) => {
   // Handle Mongoose Duplicate Key Error
   if (err.code === 11000) {
     statusCode = 409;
-    const field = Object.keys(err.keyValue)[0];
+    const field = err.keyValue ? Object.keys(err.keyValue)[0] : 'Record';
     message = `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
   }
 
@@ -21,10 +21,21 @@ const errorHandler = (err, req, res, next) => {
     message = Object.values(err.errors).map((val) => val.message).join(', ');
   }
 
+  // Handle JWT Errors
+  if (err.name === 'JsonWebTokenError') {
+    statusCode = 401;
+    message = 'Invalid authentication token.';
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    statusCode = 401;
+    message = 'Authentication token has expired. Please log in again.';
+  }
+
   res.status(statusCode).json({
     success: false,
     message: message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack,
   });
 };
 

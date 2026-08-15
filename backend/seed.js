@@ -145,9 +145,11 @@ const sampleMovies = [
   },
 ];
 
-const seedData = async () => {
+const seedData = async (exitOnFinish = true) => {
   try {
-    await connectDB();
+    if (mongoose.connection.readyState === 0) {
+      await connectDB();
+    }
 
     console.log('[Seed] Clearing existing collections...');
     await User.deleteMany({});
@@ -297,11 +299,22 @@ const seedData = async () => {
     console.log(' Family ID    : ' + family._id);
     console.log('----------------------------------------------------');
 
-    process.exit(0);
+    if (exitOnFinish) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error('[Seed Error]:', error);
-    process.exit(1);
+    if (exitOnFinish) {
+      process.exit(1);
+    } else {
+      throw error;
+    }
   }
 };
 
-seedData();
+if (require.main === module) {
+  seedData(true);
+}
+
+module.exports = { seedData, sampleMovies };
+
