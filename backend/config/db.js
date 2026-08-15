@@ -36,7 +36,13 @@ const connectDB = async () => {
       .catch(async (error) => {
         if (process.env.NODE_ENV === 'production') {
           cached.promise = null;
-          console.error(`[MongoDB] Connection failed: ${error.message}`);
+          if (error.message.includes('bad auth') || error.message.includes('authentication failed')) {
+            console.error('[MongoDB] FATAL: Invalid MongoDB Atlas username or password in MONGO_URI/MONGODB_URI.');
+            console.error('[MongoDB] TIP: If your MongoDB password contains special characters like @ # $ %, URL-encode them (e.g. @ -> %40).');
+            error.message = 'MongoDB Atlas Authentication Failed: Please check username and password in Vercel Environment Variables (MONGO_URI / MONGODB_URI). If your password contains special characters (@, #, $), URL-encode them.';
+          } else {
+            console.error(`[MongoDB] Connection failed: ${error.message}`);
+          }
           throw error;
         }
 
