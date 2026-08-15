@@ -27,7 +27,14 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         {user && (
           <div className="sidebar-user-card">
-            <img src={user.avatar} alt={user.name} className="sidebar-avatar" />
+            <img
+              src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name || 'User')}`}
+              alt={user.name}
+              className="sidebar-avatar"
+              onError={(e) => {
+                e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name || 'User')}`;
+              }}
+            />
             <div className="sidebar-user-info">
               <span className="sidebar-user-name">{user.name}</span>
               <span className={`badge badge-role-${user.role}`}>{user.role}</span>

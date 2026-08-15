@@ -20,7 +20,14 @@ const ProfilePage = () => {
     <div className="profile-page animate-fade-in">
       <div className="profile-card">
         <div className="profile-avatar-box">
-          <img src={user.avatar} alt={user.name} className="profile-avatar-lg" />
+          <img
+            src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name || 'User')}`}
+            alt={user.name}
+            className="profile-avatar-lg"
+            onError={(e) => {
+              e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name || 'User')}`;
+            }}
+          />
           <span className={`badge badge-role-${user.role} role-pill-lg`}>
             {user.role === 'parent' ? <Shield size={14} /> : <Smile size={14} />}
             <span>{user.role}</span>

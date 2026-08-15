@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema(
       enum: ['parent', 'child', 'admin'],
       default: 'parent',
     },
+    avatar: {
+      type: String,
+      default: function () {
+        return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(this.name || 'User')}`;
+      },
+    },
     familyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Family',

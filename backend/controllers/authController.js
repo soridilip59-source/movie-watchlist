@@ -69,6 +69,7 @@ const registerUser = async (req, res) => {
     }
 
     const token = generateToken(user._id);
+    const avatar = user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`;
 
     return res.status(201).json({
       success: true,
@@ -80,6 +81,7 @@ const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar,
         familyId: user.familyId || (family ? family._id : null),
         familyName: family ? family.name : null,
       },
@@ -137,6 +139,7 @@ const loginUser = async (req, res) => {
     }
 
     const token = generateToken(user._id);
+    const avatar = user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`;
 
     return res.status(200).json({
       success: true,
@@ -148,6 +151,7 @@ const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar,
         familyId: user.familyId,
         familyName,
       },
@@ -182,6 +186,8 @@ const getMe = async (req, res) => {
       } catch (err) {}
     }
 
+    const avatar = user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`;
+
     return res.status(200).json({
       success: true,
       data: {
@@ -190,6 +196,7 @@ const getMe = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar,
         familyId: user.familyId,
         familyName,
       },
@@ -199,6 +206,7 @@ const getMe = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatar,
         familyId: user.familyId,
         familyName,
       },

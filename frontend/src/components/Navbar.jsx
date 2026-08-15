@@ -69,7 +69,14 @@ const Navbar = ({ toggleSidebar }) => {
           {user ? (
             <div className="user-profile-menu">
               <Link to="/profile" className="user-pill" title="View Profile">
-                <img src={user.avatar} alt={user.name} className="user-avatar" />
+                <img
+                  src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name || 'User')}`}
+                  alt={user.name}
+                  className="user-avatar"
+                  onError={(e) => {
+                    e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name || 'User')}`;
+                  }}
+                />
                 <div className="user-info desktop-only">
                   <span className="user-name">{user.name}</span>
                   <span className={`badge badge-role-${user.role}`}>{user.role}</span>
