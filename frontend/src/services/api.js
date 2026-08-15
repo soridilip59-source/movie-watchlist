@@ -1,8 +1,15 @@
 import axios from 'axios';
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')}/api`
-  : '/api';
+// Support VITE_API_BASE_URL, VITE_API_URL, or direct backend fallback
+const rawUrl =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'https://movie-watchlist-gfgv.vercel.app/api';
+
+let apiBaseUrl = rawUrl.replace(/\/$/, '');
+if (!apiBaseUrl.endsWith('/api') && !apiBaseUrl.includes('/api/')) {
+  apiBaseUrl += '/api';
+}
 
 const API = axios.create({
   baseURL: apiBaseUrl,
